@@ -11,27 +11,28 @@ const port = 3000;
 // 透明售房网 http://www.tmsf.com/index.jsp
 var targetUrl = 'http://www.hzfc.gov.cn/yszmore.php'; // 政府房产网
 
-var content = '';
-let $ = '';
+function getNoticeList() {
+  // let result = [];
+  let text = $('.policy');
+  console.log(text);
+}
 
-superagent
+function getSuperagent(resquest) {
+  superagent
   .get(targetUrl)
   .charset() // 自动检测编码
-  .end(function (err, res) {
-  content = res
-});
+  .end((err, res) => {
+    resquest.send(JSON.stringify(res.body));
+    const $ = cheerio.load(res.text);
+    console.log($('.top'));
+  });
+}
 
 app.get('/', function (req, res) {
-  // $ = cheerio.load(content);
-  // let text = $('.policy');
-  // console.log(text);
-  res.send(content);
+  getSuperagent(res);
+  // res.send(content);
 });
 
 var server = app.listen(port, function () {
   console.log('Example app listening at http://localhost:%s', port);
 });
-
-// function getNoticeList() {
-//   let result = [];
-// }
