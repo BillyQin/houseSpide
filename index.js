@@ -12,14 +12,14 @@ const port = 3000;
 var targetUrl = 'http://www.hzfc.gov.cn/yszmore.php'; // 政府房产网
 // var targetUrl = 'https://cnodejs.org';
 
-function getSuperagent(resquest) {
+function getSuperagent(url, resquest) {
   superagent
-  .get(targetUrl)
+  .get(url)
   .charset() // 自动检测编码
   .end((err, res) => {
     var $ = cheerio.load(res.text);
     var items = [];
-    $('.policy a').each(function (idx, element) {
+    $('.policy a').each((idx, element) => {
       var $element = $(element);
       items.push(
         $element.attr('href')
@@ -31,7 +31,7 @@ function getSuperagent(resquest) {
 }
 
 app.get('/', function (req, res) {
-  getSuperagent(res);
+  getSuperagent(targetUrl, res);
 });
 
 var server = app.listen(port, function () {
