@@ -30,7 +30,7 @@ let getHtml = (url) => {
 let pageList = ($) => {
   const pages = new Map();
   $('.policy a').each((idx, element) => {
-    const href = $(element).attr('href');
+    const href = $(element).attr('href'); // 获取每个详情页pid编号
     if (href.includes('pid')) {
       pages.set(idx, href);
     }
@@ -39,21 +39,30 @@ let pageList = ($) => {
 }
 
 let getPageDetail = async (pageList) => {
-  let pageInfo = [];
-  pageList.forEach(async (item, index) => {
+  let pageInfo = new Map();
+  let getDetail = pageList.map(async (item, index) => {
     let newPage = await getHtml(`http://www.hzfc.gov.cn/${item}`).catch(err => console.log(err));
-    let attr = newPage('TABLE p.style1').text();
-    console.log(index, attr);
-    pageInfo.push(attr);
-  });
-  return pageInfo;
+    let attr = newPage('TABLE p.style1').text().trim(); // 获取预售属性是否为住宅
+    if ('住宅' === attr && attr.length === 2) {
+      // let info = {
+      //   company: newPage('TABLE p.style1').text().trim(),
+      //   company1: newPage('TABLE TR').eq.text().trim(),
+      //   company2: newPage('TABLE p.style1').text().trim(),
+      //   company3: newPage('TABLE p.style1').text().trim()
+      // }
+      console.log(newPage('TABLE TR').eq(2).text().trim());
+      pageInfo.set(index, attr);
+    }
+  })
+  await Promise.all(getDetail);
+  return [...pageInfo].sort((a, b)=>{return a[0] - b[0]});
+  // return [...pageInfo];
 }
 
 app.get('/', async (req, res) => {
   const $ = await getHtml(targetUrl).catch(err => console.log(err));
   let list = pageList($);
   let pageInfo = await getPageDetail(list);
-  console.log(pageInfo);
   res.send(pageInfo);
 });
 
