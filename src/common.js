@@ -27,4 +27,12 @@ let readFile = (file) => {
   })
 }
 
-module.exports = { getHtml, readFile }
+let writeFile = (file='./hash.txt', data) => {
+  fs.appendFile(file, data, function(err) {
+    if (err) {
+      throw err;
+    }}
+  )
+}
+
+module.exports = { getHtml, readFile, writeFile }
